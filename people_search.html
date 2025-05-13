@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+    
+    <head>
+        <meta charset="UTF-8">
+        <meta name="author" content="Alex Hounsell"/>
+        <meta name="descrption" content="People Search Page"/>
+        <title>
+            PeopleSearch
+        </title>
+        <link rel="stylesheet" href="vehicle.css">
+    </head>
+
+    <body>
+        <div id="container">
+        <header>
+            <nav>
+                <h1>
+                    People Search
+                </h1>
+                  <ul>
+                     <li><a href="people_search.html">People search</a></li>
+                     <li><a href="vehicle_search.html">Vehicle search</a></li>
+                    <li><a href="add_vehicle.html">Add a vehicle</a></li>
+                   </ul>
+            </nav>
+        </header>
+
+        <main>
+                <form>
+                <p><label for="name">Search by driver name</label> <input type="text" id="name"> </p>
+                <p><label for="license">Search by driving licence number</label> <input type="text" id="license"> </p>
+                <button type="button" onclick="submitQuery(event)">Submit</button>
+                <p id="message"></p>
+                <p id="results"></p>
+                </form>
+                
+
+                <script type="module">
+                    import {fetchPerson} from './supabase.js'
+                    window.submitQuery = async function(event)
+                    {
+                        
+                        event.preventDefault();
+                        const name = document.getElementById('name').value.trim();
+                        const license = document.getElementById('license').value.trim();
+                        const message = document.getElementById('message');
+                        const results = document.getElementById('results');
+                        message.textContent = null;
+                        results.textContent = null;
+                        
+
+                        if((name === '') && (license === ''))
+                        {
+                            message.textContent = `Error`;
+                            return;
+                        }
+                        else if((name !== '') && (license !== ''))
+                        {
+                            message.textContent = `Error`;
+                            return;
+                        }
+                        else 
+                        {
+                            const data = await fetchPerson(name, license);
+                              if(data.length > 0)
+                              {
+                                message.textContent = `Search successful`;
+                                for(let i = 0; i < data.length; i++)
+                                  {
+                                    const person = data[i];
+                                    const resultsBox = document.createElement('div');
+                                    resultsBox.className = 'dataContainer';
+                                    resultsBox.innerHTML = 
+                                    `
+                                    <p1>personid: ${person.PersonID}</p1>
+                                    <p1>name: ${person.Name}</p1>
+                                    <p1>address: ${person.Address}</p1>
+                                    <p1>dob: ${person.DOB}</p1>
+                                    <p1>licensenumber: ${person.LicenseNumber}</p1>
+                                    <p1>expirydate: ${person.ExpiryDate}</p1>
+                                    `;
+                                    results.appendChild(resultsBox);
+                                 };
+                                
+                              }
+                              else
+                              {
+                                 message.textContent = `No result found`
+                              }
+                        }
+                         
+                                                    
+                    }
+                </script>
+               
+        </main>
+
+                
+
+        <aside>
+            <img src="COMP1004 People.png" alt="people logo">
+            
+        </aside>
+
+        <footer>
+            <p>Comp 1004 Coursework People Footer</p>
+        </footer>
+        </div>
+
+        
+    </body>
+    </html>

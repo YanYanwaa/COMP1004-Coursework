@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+    <script src="supabase.js" type="module"></script>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="author" content="Alex Hounsell"/>
+        <meta name="descrption" content="Add Vehicle Page"/>
+        <title>
+            AddVehicle
+        </title>
+        <link rel="stylesheet" href="vehicle.css">
+    </head>
+
+    <body>
+        <div id="container">
+        <header>
+            <nav>
+                <h1>
+                    Add a Vehicle
+                </h1>
+                  <ul>
+                     <li><a href="people_search.html">People search</a></li>
+                     <li><a href="vehicle_search.html">Vehicle search</a></li>
+                     <li><a href="add_vehicle.html">Add a vehicle</a></li>
+                   </ul>
+            </nav>
+        </header>
+
+        <main>
+                <form>
+                <p><label for="rego">Registration Number</label> <input type="text" id="rego"> </p>
+                <p><label for="make">Make</label> <input type="text" id="make"> </p>
+                <p><label for="model">Model</label> <input type="text" id="model"> </p>
+                <p><label for="colour">Colour</label> <input type="text" id="colour"> </p>
+                <p><label for="owner">Owner Name</label> <input type="text" id="owner">
+                <button type="button" onclick="checkOwner(event)" id="ownerButton" disabled>Check owner</button></p>
+                <p id="results"></p>
+                <p id="addOwner"></p>
+                <button type="button" onclick="submitQuery(event)">Submit</button>
+                <p id="message"></p>
+                </form>
+                
+
+                <script type="module">
+                    import {searchPerson} from './supabase.js'
+                    const rego = document.getElementById('rego').value.trim();
+                    const make = document.getElementById('make').value.trim();
+                    const model = document.getElementById('model').value.trim();
+                    const colour = document.getElementById('colour').value.trim();
+                    const ownerName = document.getElementById('owner');
+                    const ownerButton = document.getElementById('ownerButton');
+                    const message = document.getElementById('message');
+                    const results = document.getElementById('results');
+                    const addOwner = document.getElementById('addOwner');
+                    ownerName.addEventListener('input', enableOwnerButton);
+                    
+
+                    function enableOwnerButton()
+                    {
+                        ownerButton.disabled = ownerName === '';
+                    }
+                
+                    window.checkOwner = async function(event)
+                    {
+                        event.preventDefault();
+                        results.textContent = null;
+                        message.textContent = null;
+                        const data = await searchPerson(ownerName.value);
+                              if(data.length > 0)
+                              {
+                              
+                                for(let i = 0; i < data.length; i++)
+                                  {
+                                    const person = data[i];
+                                    const resultsBox = document.createElement('div');
+                                    resultsBox.className = 'dataContainer';
+                                    resultsBox.id = 'owner-results';
+                                    resultsBox.innerHTML = 
+                                    `
+                                    
+                                    <p1>personid: ${person.PersonID}</p1>
+                                    <p1>name: ${person.Name}</p1>
+                                    <p1>address: ${person.Address}</p1>
+                                    <p1>dob: ${person.DOB}</p1>
+                                    <p1>licensenumber: ${person.LicenseNumber}</p1>
+                                    <p1>expirydate: ${person.ExpiryDate}</p1>
+                                    <button type="button" onclick="selectOwner(${person.PersonID})">Select owner</button>
+                                    `;
+                                    results.appendChild(resultsBox);
+                                 };
+                                const newButton = document.createElement('button');
+                                newButton.textContent = "New owner";
+                                newButton.type = "button";
+                                newButton.onclick = newOwner;
+                                
+                                results.appendChild(newButton);
+                              }
+                              else
+                              {
+                                
+                                const newButton = document.createElement('button');
+                                newButton.textContent = "New owner";
+                                newButton.type = "button";
+                                newButton.onclick = newOwner;
+                                
+                                results.appendChild(newButton);
+                                
+                              }
+                    }
+
+                    function selectOwner(ownerID)
+                    {
+                        
+                    }
+                   
+                    function newOwner(event)
+                    {
+                                    const resultsPrompt = document.createElement('div');
+                                    resultsPrompt.className = 'dataContainer';
+                                    resultsPrompt.id = 'ownerinput';
+                                    resultsPrompt.innerHTML = 
+                                    `
+                                        <form>
+                                            <p>Name <input type="text" id="name"> </p>
+                                            <p>Address <input type="text" id="address"> </p>
+                                            <p>DOB <input type="text" id="dob"> </p>
+                                            <p>License <input type="text" id="license"> </p>
+                                            <p>Expiry Date <input type="text" id="expire"></p>
+                                        
+                                            <p><button type="button" onclick="addNewOwner(event)" id="addNewOwner">Add owner</button></p>
+                                            
+                                        </form>
+                                    `;
+                                    addOwner.appendChild(resultsPrompt);
+
+                                    
+
+                    }
+
+                    window.addNewOwner = async function(event)
+                    {
+                                    const messageOwner = document.createElement('div');
+                                    messageOwner.innerHTML = 
+                                    `
+                                        <p id="message-owner"></p>
+                                    `;
+                        const name = document.getElementById('name').value.trim();
+                        const address = document.getElementById('address').value.trim();
+                        const dob = document.getElementById('dob').value.trim();
+                        const license = document.getElementById('license').value.trim();
+                        const expire = document.getElementById('expire').value.trim();
+                        
+                        const added = await newOwnerSupabase(name,address,dob,license,expire)
+                    }
+
+                    function submitQuery(event)
+                    {
+                        event.preventDefault();
+                        if((document.getElementById('owner').value.trim() == ''))
+                        {
+                            message.textContent = `Error`;
+                        }
+                        else
+                        {
+                            message.textContent = `Search successful`;
+                        }
+                        
+                    }
+                </script>
+        </main>
+
+                
+
+        <aside>
+            <img src="COMP1004 VehicleAdd.png" alt="people logo">
+            
+        </aside>
+
+        <footer>
+            <p>Comp 1004 Coursework People Footer</p>
+        </footer>
+        </div>
+    </body>

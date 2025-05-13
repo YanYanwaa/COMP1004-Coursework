@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="author" content="Alex Hounsell"/>
+        <meta name="descrption" content="Vehicle Search Page"/>
+        <title>
+            VehicleSearch
+        </title>
+        <link rel="stylesheet" href="vehicle.css">
+    </head>
+
+    <body>
+        <div id="container">
+        <header>
+            <nav>
+                <h1>
+                    Vehicle Search
+                </h1>
+                  <ul>
+                     <li><a href="people_search.html">People search</a></li>
+                     <li><a href="vehicle_search.html">Vehicle search</a></li>
+                     <li><a href="add_vehicle.html">Add a vehicle</a></li>
+                   </ul>
+            </nav>
+        </header>
+
+        <main>
+                <form>
+                <p><label for="rego">Search registration number</label> <input type="text" id="rego"> </p>
+                <button type="button" onclick="submitQuery(event)">Submit</button>
+                <p id="message"></p>
+                <p id="results"></p>
+                
+                </form>
+
+                <script type="module">
+                    import {fetchVehicle} from './supabase.js'
+                    window.submitQuery = async function(event)
+                    {
+                        
+                        event.preventDefault();
+                        const rego = document.getElementById('rego').value.trim();
+                        const message = document.getElementById('message');
+                        const results = document.getElementById('results');
+                        message.textContent = null;
+                        results.textContent = null;
+                        
+
+                        if((rego === ''))
+                        {
+                            message.textContent = `Error`;
+                            return;
+                        }
+                        else 
+                        {
+                            const data = await fetchVehicle(rego);
+                              if(data.length > 0)
+                              {
+                                message.textContent = `Search successful`;
+                                for(let i = 0; i < data.length; i++)
+                                  {
+                                    const vehicle = data[i];
+                                    const resultsBox = document.createElement('div');
+                                    resultsBox.className = 'dataContainer';
+                                    resultsBox.innerHTML = 
+                                    `
+                                    <p1>vehicleid: ${vehicle.VehicleID}</p1>
+                                    <p1>make: ${vehicle.Make}</p1>
+                                    <p1>model: ${vehicle.Model}</p1>
+                                    <p1>colour: ${vehicle.Colour}</p1>
+                                    <p1>ownerid: ${vehicle.OwnerID}</p1>
+                                    `;
+                                    results.appendChild(resultsBox);
+                                 };
+                                
+                              }
+                              else
+                              {
+                                 message.textContent = `No result found`
+                              }
+                        }
+                         
+                                                    
+                    }
+                </script>
+
+
+        </main>
+
+                
+
+        <aside>
+            <img src="COMP1004 Vehicle.png" alt="vehicle logo">
+            
+        </aside>
+
+        <footer>
+            <p>Comp 1004 Coursework Vehicle Footer</p>
+        </footer>
+        </div>
+    </body>
